@@ -306,8 +306,13 @@ module GCal4Ruby
       xml.root.elements.each(){}.map do |ele|
         case ele.name
           when 'id'
+          if @feed_uri =~ /events/
             @calendar_id, @id = @feed_uri.gsub("http://www.google.com/calendar/feeds/", "").split("/events/")
             @id = "#{@calendar_id}/private/full/#{@id}"
+          else
+            @id = @feed_uri.gsub("http://www.google.com/calendar/feeds/", "")
+            @calendar_id = @id.match(/\A(.*)\/private\/full\/.*/)[1]
+          end
           when 'edited'
             @edited = Time.parse(ele.text)
           when 'content'
