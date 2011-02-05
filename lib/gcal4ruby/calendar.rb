@@ -235,6 +235,8 @@ module GCal4Ruby
         case ele.name
           when "id"
           @id = ele.text.gsub("http://www.google.com/calendar/feeds/default/calendars/", "")
+          @id =      @id.gsub("http://www.google.com/calendar/feeds/default/owncalendars/full/", "")
+          @id =      @id.gsub("http://www.google.com/calendar/feeds/default/allcalendars/full/", "")
           when 'summary'
           @summary = ele.text
           when "color"
