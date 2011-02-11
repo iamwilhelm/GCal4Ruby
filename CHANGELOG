@@ -1,4 +1,7 @@
 #=CHANGELOG
+#==version 0.5.7
+#* merged in fix for recurrence events
+#* Updated readme
 #==version 0.5.6
 #* Fixed bug with dates with no start time
 #* Updated to use gdata4ruby 0.1.5
