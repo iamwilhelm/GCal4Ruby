@@ -4,7 +4,21 @@
 GCal4Ruby is a full featured wrapper for the google calendar API.	 GCal4Ruby implements all of the functionality available through the Google Calnedar API, including permissions, attendees, reminders and event recurrence.	 
 
 ##Author and Contact Information
-GCal4Ruby was created and is maintained by {Mike Reich}[mailto:mike@seabourneconsulting.com]	and is licenses under the LGPL v3.	Feel free to use and update, but be sure to contribute your code back to the project and attribute as required by the license.	You can find the text of the LGPL here: http://www.gnu.org/licenses/lgpl.html.
+GCal4Ruby was created and is maintained by 
+{Mike Reich (mjreich)}[mailto:mike@seabourneconsulting.com]
+
+With source contributions by:
+
+* {John Paul Narowski (jnarowski)}[mailto: jnarowski@gmail.com]
+* {Wil Chung (iamwilhelm)}[mailto: iamwil@gmail.com]
+
+And documentation contributions by:
+
+* {Volkan Unsal}[mailto:spocksplanet@gmail.com}
+
+and is licenses under the LGPL v3.
+
+Feel free to use and update, but be sure to contribute your code back to the project and attribute as required by the license.	You can find the text of the LGPL here: http://www.gnu.org/licenses/lgpl.html.
 
 ###Website
 http://cookingandcoding.com/gcal4ruby/
