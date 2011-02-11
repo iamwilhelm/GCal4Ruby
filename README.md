@@ -33,11 +33,22 @@ GCal4Ruby has three major components: the service, calendar and event objects.	E
 ##Examples
 Below are some common usage examples.	 For more examples, check the documentation.
 ###Service
-1. Authenticate
+1. Authenticate using client login (currently disabled)
 	service # Service.new
-	service.authenticate("user@gmail.com", "password")
+	service.authenticate({ :username => "user@gmail.com", :password => "password" })
 
-2. Get Calendar List
+
+2. Authenticate using OAuth
+        require 'oauth'
+        consumer = OAuth::Consumer.new(auth[:consumer_key],
+                                       auth[:consumer_secret],
+                                       {:site => 'https://wwww.google.com'})
+        access_token = OAuth::AccessToken.new(consumer, auth[:token], auth[:secret])
+
+	service = Service.new
+	service.authenticate({ :access_token => access_token })
+
+3. Get Calendar List
 	calendars # service.calendars
 
 ###Calendar
