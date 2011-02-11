@@ -1,5 +1,9 @@
 #GCal4Ruby
 
+##Warning:
+This version of GCal4Ruby uses only undocumented OAuth authentication, and an
+unofficial version of GData4Ruby.
+
 ##Introduction
 GCal4Ruby is a full featured wrapper for the google calendar API.	 GCal4Ruby implements all of the functionality available through the Google Calnedar API, including permissions, attendees, reminders and event recurrence.	 
 
@@ -103,3 +107,7 @@ All usages assume a successfully authenticated Service and valid Calendar.
 	event.end_time = Time.parse("06/20/2009 at 8 pm")
 	event.attendees => {:name => "Kate", :email => "kate@gmail.com"}
 	event.save
+
+### Errata and Bugs you should know about
+Currently, an event's 'edited' time attribute returns nil. instead use
+'updated'
