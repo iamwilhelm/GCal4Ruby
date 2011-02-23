@@ -161,12 +161,12 @@ module GCal4Ruby
       if @all_day
         output += "DTSTART;VALUE=DATE:#{@start_time.utc.strftime("%Y%m%d")}\n"
       else
-        output += "DTSTART;VALUE=DATE-TIME:#{@start_time.utc.complete}\n"
+        output += "DTSTART;VALUE=DATE-TIME:#{@start_time.complete}\n"
       end
       if @all_day
         output += "DTEND;VALUE=DATE:#{@end_time.utc.strftime("%Y%m%d")}\n"
       else
-        output += "DTEND;VALUE=DATE-TIME:#{@end_time.utc.complete}\n"
+        output += "DTEND;VALUE=DATE-TIME:#{@end_time.complete}\n"
       end
       output += "RRULE:"
       if @frequency
