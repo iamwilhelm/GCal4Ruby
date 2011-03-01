@@ -255,11 +255,11 @@ module GCal4Ruby
             #   set_reminder(ele) if @reminder
             # end
           when "eventStatus"
-            ele.attributes["value"] = STATUS[@status]
+            # ele.attributes["value"] = STATUS[@status]
           when "transparency"
-            ele.attributes["value"] = TRANSPARENCY[@transparency]
+            # ele.attributes["value"] = TRANSPARENCY[@transparency]
           when "where"
-            ele.attributes["valueString"] = @where
+            # ele.attributes["valueString"] = @where
           when "recurrence"
             # puts 'recurrence element found' if service.debug
             # if @recurrence
@@ -275,12 +275,12 @@ module GCal4Ruby
             # end
         end
       end        
-      if not @attendees.empty?
-        xml.root.elements.delete_all "gd:who"
-        @attendees.each do |a|
-          xml.root.add_element("gd:who", {"email" => a[:email], "valueString" => a[:name], "rel" => "http://schemas.google.com/g/2005#event.attendee"})
-        end
-      end
+      # if not @attendees.empty?
+      #   xml.root.elements.delete_all "gd:who"
+      #   @attendees.each do |a|
+      #     xml.root.add_element("gd:who", {"email" => a[:email], "valueString" => a[:name], "rel" => "http://schemas.google.com/g/2005#event.attendee"})
+      #   end
+      # end
       xml.to_s
     end
     
