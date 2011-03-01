@@ -238,22 +238,22 @@ module GCal4Ruby
           when "content"
             ele.text = @content
           when "when"
-            if not @recurrence
-              puts 'all_day = '+@all_day.to_s if service.debug
-              if @all_day
-                puts 'saving as all-day event' if service.debug 
-              else
-                puts 'saving as timed event' if service.debug
-              end
-              ele.attributes["startTime"] = @all_day ? @start_time.strftime("%Y-%m-%d") : @start_time.utc.xmlschema
-              ele.attributes["endTime"] = @all_day ? @end_time.strftime("%Y-%m-%d") : @end_time.utc.xmlschema
-              set_reminder(ele)
-            else
-              xml.root.delete_element("/entry/gd:when")
-              ele = xml.root.add_element("gd:recurrence")
-              ele.text = @recurrence.to_recurrence_string
-              set_reminder(ele) if @reminder
-            end
+            # if not @recurrence
+            #   puts 'all_day = '+@all_day.to_s if service.debug
+            #   if @all_day
+            #     puts 'saving as all-day event' if service.debug 
+            #   else
+            #     puts 'saving as timed event' if service.debug
+            #   end
+            #   ele.attributes["startTime"] = @all_day ? @start_time.strftime("%Y-%m-%d") : @start_time.utc.xmlschema
+            #   ele.attributes["endTime"] = @all_day ? @end_time.strftime("%Y-%m-%d") : @end_time.utc.xmlschema
+            #   set_reminder(ele)
+            # else
+            #   xml.root.delete_element("/entry/gd:when")
+            #   ele = xml.root.add_element("gd:recurrence")
+            #   ele.text = @recurrence.to_recurrence_string
+            #   set_reminder(ele) if @reminder
+            # end
           when "eventStatus"
             ele.attributes["value"] = STATUS[@status]
           when "transparency"
@@ -261,18 +261,18 @@ module GCal4Ruby
           when "where"
             ele.attributes["valueString"] = @where
           when "recurrence"
-            puts 'recurrence element found' if service.debug
-            if @recurrence
-              puts 'setting recurrence' if service.debug
-              ele.text = @recurrence.to_recurrence_string
-            else
-              puts 'no recurrence, adding when' if service.debug
-              w = xml.root.add_element("gd:when")
-              xml.root.delete_element("/entry/gd:recurrence")
-              w.attributes["startTime"] = @all_day ? @start_time.strftime("%Y-%m-%d") : @start_time.xmlschema
-              w.attributes["endTime"] = @all_day ? @end_time.strftime("%Y-%m-%d") : @end_time.xmlschema
-              set_reminder(w)
-            end
+            # puts 'recurrence element found' if service.debug
+            # if @recurrence
+            #   puts 'setting recurrence' if service.debug
+            #   ele.text = @recurrence.to_recurrence_string
+            # else
+            #   puts 'no recurrence, adding when' if service.debug
+            #   w = xml.root.add_element("gd:when")
+            #   xml.root.delete_element("/entry/gd:recurrence")
+            #   w.attributes["startTime"] = @all_day ? @start_time.strftime("%Y-%m-%d") : @start_time.xmlschema
+            #   w.attributes["endTime"] = @all_day ? @end_time.strftime("%Y-%m-%d") : @end_time.xmlschema
+            #   set_reminder(w)
+            # end
         end
       end        
       if not @attendees.empty?
