@@ -348,6 +348,55 @@ module GCal4Ruby
         end      
       end
     end
+
+    def load_from_nokogiri(xml)
+      super(xml)
+
+      @etag = xml["etag"]
+
+      e = xml.at_css("id")
+      if @feed_uri =~ /events/
+        @calendar_id, @id = @feed_uri.gsub("http://www.google.com/calendar/feeds/", "").split("/events/")
+        @id = "#{@calendar_id}/private/full/#{@id}"
+      else
+        @id = @feed_uri.gsub("http://www.google.com/calendar/feeds/", "")
+        @calendar_id = @id.match(/\A(.*)\/private\/full\/.*/)[1]
+      end
+      
+      @edited = (e = xml.at_css("edited")) && Time.parse(e.content)
+      @content = (e = xml.at_css("content")) && e.content
+
+      @start_time = (e = xml.at_css("gd|when[startTime]")) && Time.parse(e["startTime"])
+      @end_time = (e = xml.at_css("gd|when[endTime]")) && Time.parse(e["endTime"])
+      @all_day = (e = xml.at_css("gd|when[startTime]")) && !e["startTime"].include?('T')
+      @reminder = xml.css("gd|when gd|reminder").map { |x|
+        x.attributes.merge(x.attributes) { |k,v| v.value }
+      }
+
+      @where = (e = xml.at_css("gd|where[valueString]")) && e["valueString"]
+      @edit_feed = (e = xml.at_css("link[rel=edit]")) && e["href"]
+
+      @attendees = xml.css("gd|who").map { |x|
+        status = x.at_css("gd|attendeeStatus")
+        { :email => x['email'],
+          :name => x['valueString'],
+          :role => x['rel'].gsub("http://schemas.google.com/g/2005#event.", ""),
+          :status => status ? status['value'].gsub("http://schemas.google.com/g/2005#event.", "") : ""
+        }
+      }
+
+      @status = (e = xml.at_css("gd|eventStatus")) && e["value"].gsub("http://schemas.google.com/g/2005#event.", "").to_sym
+
+      @recurrence = (e = xml.at_css("gd|recurrence")) && Recurrence.new(e.content)
+
+      e = xml.at_css("gd|transparency")
+      unless e.nil?
+        @transparency = case e["value"]
+                        when "http://schemas.google.com/g/2005#event.transparent" then :free
+                        when "http://schemas.google.com/g/2005#event.opaque" then :busy
+                        end
+      end
+    end
     
     #Reloads the event data from the Google Calendar Service.  Returns true if successful,
     #false otherwise.
@@ -389,11 +438,13 @@ module GCal4Ruby
         end
         if args[:calendar]
           cal = Calendar.find(service, {:id => args[:calendar]})
+          
           args.delete(:calendar)
           ret = service.send_request(GData4Ruby::Request.new(:get, cal.content_uri, nil, nil, args))
-          xml = REXML::Document.new(ret.body).root
-          xml.elements.each("entry") do |e|
-            results << get_instance(service, e)
+
+          xml = Nokogiri::XML(ret.body)
+          results = xml.xpath("//xmlns:entry").map do |x|
+            get_instance(service, x)
           end
         else
           service.calendars.each do |cal|
@@ -438,12 +489,14 @@ module GCal4Ruby
         if xml.name == 'feed'
           xml = xml.elements.each("entry"){}[0]
         end
+        ele = GData4Ruby::Utils::add_namespaces(xml)
+        e = Event.new(service)
+        e.load(ele.to_s)
       else
         xml = d
+        e = Event.new(service)
+        e.load_from_nokogiri(xml)
       end
-      ele = GData4Ruby::Utils::add_namespaces(xml)
-      e = Event.new(service)
-      e.load(ele.to_s)
       e
     end
   end
