@@ -23,6 +23,7 @@ require 'gcal4ruby/calendar'
 require 'gcal4ruby/event'
 require 'gcal4ruby/recurrence'
 require 'rexml/document'
+require 'nokogiri'
 
 module GCal4Ruby
   #The service class is the main handler for all direct interactions with the 

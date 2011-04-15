@@ -12,4 +12,5 @@ Gem::Specification.new do |s|
    s.has_rdoc = true
    s.test_files = ['test/unit.rb'] 
    s.add_dependency('gdata4ruby', '>= 0.1.5')
+   s.add_dependency('nokogiri', '>= 1.4.0')
 end 
