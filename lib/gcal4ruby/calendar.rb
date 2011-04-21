@@ -171,7 +171,8 @@ module GCal4Ruby
         d = service.send_request(GData4Ruby::Request.new(:get, CALENDAR_FEED+id, {"If-Not-Match" => "*"}))
         puts d.inspect if service.debug
         if d
-          return get_instance(service, d)
+          xml = Nokogiri::XML(d.body)
+          return get_instance(service, xml)
         end
       else
         #fugly, but Google doesn't provide a way to query the calendar feed directly
@@ -282,6 +283,30 @@ module GCal4Ruby
       end
       return true
     end
+
+    def load_from_nokogiri(xml)
+      super(xml)
+
+      @exists = true
+      
+      @id = (e = xml.at_css("id")) && 
+        e.content.gsub("http://www.google.com/calendar/feeds/default/calendars/", "")
+        .gsub("http://www.google.com/calendar/feeds/default/owncalendars/full/", "")
+        .gsub("http://www.google.com/calendar/feeds/default/allcalendars/full/", "")
+
+      @summary = (e = xml.at_css("summary")) && e.content
+      @color = (e = xml.at_css("gCal|color")) && e["value"]
+      @hidden = (e = xml.at_css("gCal|hidden")) && e["value"] == "true"
+      @timezone = (e = xml.at_css("gCal|timezone")) && e["value"]
+      @selected = (e = xml.at_css("gCal|selected")) && e["value"] == "true"
+      @edit_feed = (e = xml.at_css("link[rel=edit]")) && e["href"]
+      @editable = !(xml.at_css("gCal|accesslevel[value=editor][value=owner][value=root]")).nil?
+      
+      # TODO: going to skip the access control list because we don't
+      # need it
+      
+      return true
+    end
     
     #Helper function to return a formatted iframe embedded google calendar.  Parameters are:
     #1. *params*: a hash of parameters that affect the display of the embedded calendar.  Accepts any parameter that the google iframe recognizes.  Here are the most common:
@@ -356,13 +381,16 @@ module GCal4Ruby
         if xml.name == 'feed'
           xml = xml.elements.each("entry"){}[0]
         end
+        ele = GData4Ruby::Utils::add_namespaces(xml)
+        cal = Calendar.new(service)
+        cal.load(ele.to_s)
+        cal
       else
         xml = d
+        cal = Calendar.new(service)
+        cal.load_from_nokogiri(xml)
+        cal
       end
-      ele = GData4Ruby::Utils::add_namespaces(xml)
-      cal = Calendar.new(service)
-      cal.load(ele.to_s)
-      cal
     end
   end 
 end
