@@ -363,7 +363,7 @@ module GCal4Ruby
         @calendar_id = @id.match(/\A(.*)\/private\/full\/.*/)[1]
       end
       
-      @edited = (e = xml.at_css("edited")) && Time.parse(e.content)
+      @edited = (e = xml.at_css("gd|edited")) && Time.parse(e.content)
       @content = (e = xml.at_css("content")) && e.content
 
       @start_time = (e = xml.at_css("gd|when[startTime]")) && Time.parse(e["startTime"])
