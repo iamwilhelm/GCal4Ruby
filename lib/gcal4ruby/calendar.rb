@@ -300,8 +300,8 @@ module GCal4Ruby
       @timezone = (e = xml.at_css("gCal|timezone")) && e["value"]
       @selected = (e = xml.at_css("gCal|selected")) && e["value"] == "true"
       @edit_feed = (e = xml.at_css("link[rel=edit]")) && e["href"]
-      @editable = !(xml.at_css("gCal|accesslevel[value=editor][value=owner][value=root]")).nil?
-      
+      @editable = (e = xml.at_css("gCal|accesslevel[value]")) && %w(editor owner root).include?(e["value"])
+                   
       # TODO: going to skip the access control list because we don't
       # need it
       
