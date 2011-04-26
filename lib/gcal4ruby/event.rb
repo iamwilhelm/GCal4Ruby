@@ -232,56 +232,24 @@ module GCal4Ruby
     
     #Returns an XML representation of the event.
     def to_xml()
-      xml = REXML::Document.new(super)
-      xml.root.elements.each(){}.map do |ele|
-        case ele.name
-          when "content"
-            ele.text = @content
-          when "when"
-            # if not @recurrence
-            #   puts 'all_day = '+@all_day.to_s if service.debug
-            #   if @all_day
-            #     puts 'saving as all-day event' if service.debug 
-            #   else
-            #     puts 'saving as timed event' if service.debug
-            #   end
-            #   ele.attributes["startTime"] = @all_day ? @start_time.strftime("%Y-%m-%d") : @start_time.utc.xmlschema
-            #   ele.attributes["endTime"] = @all_day ? @end_time.strftime("%Y-%m-%d") : @end_time.utc.xmlschema
-            #   set_reminder(ele)
-            # else
-            #   xml.root.delete_element("/entry/gd:when")
-            #   ele = xml.root.add_element("gd:recurrence")
-            #   ele.text = @recurrence.to_recurrence_string
-            #   set_reminder(ele) if @reminder
-            # end
-          when "eventStatus"
-            # ele.attributes["value"] = STATUS[@status]
-          when "transparency"
-            # ele.attributes["value"] = TRANSPARENCY[@transparency]
-          when "where"
-            # ele.attributes["valueString"] = @where
-          when "recurrence"
-            # puts 'recurrence element found' if service.debug
-            # if @recurrence
-            #   puts 'setting recurrence' if service.debug
-            #   ele.text = @recurrence.to_recurrence_string
-            # else
-            #   puts 'no recurrence, adding when' if service.debug
-            #   w = xml.root.add_element("gd:when")
-            #   xml.root.delete_element("/entry/gd:recurrence")
-            #   w.attributes["startTime"] = @all_day ? @start_time.strftime("%Y-%m-%d") : @start_time.xmlschema
-            #   w.attributes["endTime"] = @all_day ? @end_time.strftime("%Y-%m-%d") : @end_time.xmlschema
-            #   set_reminder(w)
-            # end
-        end
-      end        
-      # if not @attendees.empty?
-      #   xml.root.elements.delete_all "gd:who"
-      #   @attendees.each do |a|
-      #     xml.root.add_element("gd:who", {"email" => a[:email], "valueString" => a[:name], "rel" => "http://schemas.google.com/g/2005#event.attendee"})
-      #   end
-      # end
-      xml.to_s
+      xml = Nokogiri::XML(@xml.to_s)
+      
+      default_namespace = xml.root.add_namespace(nil, "http://www.w3.org/2005/Atom")
+      gd_namespace = xml.root.add_namespace("gd", "http://schemas.google.com/g/2005")
+      gcal_namespace = xml.root.add_namespace("gCal", "http://schemas.google.com/gCal/2005")
+      xml.root["gd:etag"] = @etag if @etag && @etag != ''
+
+      # we want to transform when and recurrence to the gd namespace,
+      # otherwise, gcalendar won't take it
+      (e = xml.at_css("|when")) && e.namespace = gd_namespace
+      (e = xml.at_css("|recurrence")) && e.namespace = gd_namespace
+
+      # add parts of the calendar event that might have changed
+      # NOTE: since we're currently not changing anything beyond the
+      # content, we're just not going to change anything, just to be safe
+      (e = xml.at_css("|content")) && e.content = @content
+      
+      return xml.to_s
     end
     
     #The event's parent calendar
