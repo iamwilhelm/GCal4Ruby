@@ -414,6 +414,11 @@ module GCal4Ruby
           results = xml.xpath("//xmlns:entry").map do |x|
             get_instance(service, x)
           end
+          
+          # xml = REXML::Document.new(ret.body).root
+          # xml.elements.each("entry") do |e|
+          #   results << get_instance(service, e)
+          # end
         else
           service.calendars.each do |cal|
             ret = service.send_request(GData4Ruby::Request.new(:get, cal.content_uri, nil, nil, args))
@@ -461,6 +466,12 @@ module GCal4Ruby
         e = Event.new(service)
         e.load(ele.to_s)
       else
+        # xml = d
+        # ele = GData4Ruby::Utils::add_namespaces(xml)
+        # e = Event.new(service)
+        # e.load(ele.to_s)
+
+        # With Nokogiri
         xml = d
         e = Event.new(service)
         e.load_from_nokogiri(xml)
