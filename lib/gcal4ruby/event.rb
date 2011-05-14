@@ -233,22 +233,40 @@ module GCal4Ruby
     #Returns an XML representation of the event.
     def to_xml()
       xml = Nokogiri::XML(@xml.to_s)
-      
+
       default_namespace = xml.root.add_namespace(nil, "http://www.w3.org/2005/Atom")
       gd_namespace = xml.root.add_namespace("gd", "http://schemas.google.com/g/2005")
       gcal_namespace = xml.root.add_namespace("gCal", "http://schemas.google.com/gCal/2005")
       xml.root["gd:etag"] = @etag if @etag && @etag != ''
 
+      # NOTE, when we use nokogiri, we need to use an empty namespace
+      # like xml.at_css("|when"), not xml.at_css("when")
+      
       # we want to transform when and recurrence to the gd namespace,
       # otherwise, gcalendar won't take it
+      (e = xml.at_css("|comments")) && e.namespace = gd_namespace
+      (e = xml.at_css("|feedLink")) && e.namespace = gd_namespace
+      (e = xml.at_css("|eventStatus")) && e.namespace = gd_namespace
+      (e = xml.at_css("|where")) && e.namespace = gd_namespace
+      (w = xml.css("|who")) && w.each { |e| e.namespace = gd_namespace }
+      (a = xml.css("|attendeeStatus")) && a.each { |e| e.namespace = gd_namespace }
       (e = xml.at_css("|when")) && e.namespace = gd_namespace
+      (e = xml.at_css("|transparency")) && e.namespace = gd_namespace
+      (e = xml.at_css("|visibility")) && e.namespace = gd_namespace
       (e = xml.at_css("|recurrence")) && e.namespace = gd_namespace
 
+      (e = xml.at_css("|anyoneCanAddSelf")) && e.namespace = gcal_namespace
+      (e = xml.at_css("|guestsCanInviteOthers")) && e.namespace = gcal_namespace
+      (e = xml.at_css("|guestsCanModify")) && e.namespace = gcal_namespace
+      (e = xml.at_css("|guestsCanSeeGuests")) && e.namespace = gcal_namespace
+      (e = xml.at_css("|sequence")) && e.namespace = gcal_namespace
+      (e = xml.at_css("|uid")) && e.namespace = gcal_namespace
+      
       # add parts of the calendar event that might have changed
       # NOTE: since we're currently not changing anything beyond the
       # content, we're just not going to change anything, just to be safe
       (e = xml.at_css("|content")) && e.content = @content
-      
+
       return xml.to_s
     end
     
